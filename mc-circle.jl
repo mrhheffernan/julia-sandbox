@@ -1,7 +1,7 @@
 # Math's hello world: Calculating pi via Monte Carlo
 using Plots
+using ArgParse
 
-n_samples = parse(Int64, ARGS[1]::String) # Allow user to specify number of samples
 radius = 1
 
 function check(sample_x, sample_y)
@@ -28,14 +28,41 @@ function integrate_quadrant(n_samples)
     return success / n_samples, samples, reduce(vcat, transpose.(samples_inside)), reduce(vcat, transpose.(samples_outside))
 end
 
-quadrant, samples, samples_inside, samples_outside = integrate_quadrant(n_samples)
-pi_estimate = 4 * quadrant
+function parse_commandline()
+    s = ArgParseSettings()
 
-println("pi: ", pi_estimate)
+    @add_arg_table s begin
+        "--num_samples", "-n"
+            help = "Number of samples"
+            arg_type = Int
+            default = 100
+            required = true
+        "--plot", "-p"
+            help = "Output a plot"
+            action = :store_true
+    end
 
-p = plot(samples_inside[:,1], samples_inside[:,2], seriestype=:scatter, label="Samples: Inside")
-plot!(samples_outside[:,1], samples_outside[:,2], seriestype=:scatter, label="Samples: Outside")
+    return parse_args(s)
+end
 
-xlabel!("X Coordinate")
-ylabel!("Y Coordinate")
-savefig(p, "plot.png")
+function main()
+    # Allow user to specify number of samples
+    args = parse_commandline()
+    n_samples = args["num_samples"]
+
+    quadrant, samples, samples_inside, samples_outside = integrate_quadrant(n_samples)
+    pi_estimate = 4 * quadrant
+
+    println("pi: $pi_estimate")
+
+    if args["plot"]
+        p = plot(samples_inside[:,1], samples_inside[:,2], seriestype=:scatter, label="Samples: Inside")
+        plot!(samples_outside[:,1], samples_outside[:,2], seriestype=:scatter, label="Samples: Outside")
+
+        xlabel!("X Coordinate")
+        ylabel!("Y Coordinate")
+        savefig(p, "plot.png")
+    end
+end
+
+main()
