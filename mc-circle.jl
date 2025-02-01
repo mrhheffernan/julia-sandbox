@@ -1,5 +1,5 @@
 # Math's hello world: Calculating pi via Monte Carlo
-import Plots: plot, plot!, xlabel!, ylabel!, savefig
+import Plots: plot, plot!, savefig
 using ArgParse: ArgParseSettings, @add_arg_table, parse_args
 
 function check(sample_x::Float64, sample_y::Float64, radius::Float32)::Bool
@@ -82,11 +82,9 @@ function main()
 
     if args["plot"]
         # Only plot if flag is passed
-        p = plot(samples_inside[:,1], samples_inside[:,2], seriestype=:scatter, label="Samples: Inside")
+        p = plot(samples_inside[:,1], samples_inside[:,2], seriestype=:scatter, label="Samples: Inside", xlabel="X Coordinate", ylabel="Y Coordinate")
         plot!(samples_outside[:,1], samples_outside[:,2], seriestype=:scatter, label="Samples: Outside")
 
-        xlabel!("X Coordinate")
-        ylabel!("Y Coordinate")
         savefig(p, "plot.png")
     end
 end
